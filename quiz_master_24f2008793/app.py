@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from models import db, User, Subject, Chapter, Quiz, Question, Score
@@ -113,6 +112,19 @@ def add_quiz():
 def add_question():
     if not current_user.is_admin:
         return redirect(url_for('home'))
+    text = request.form['text']
+    options = request.form.getlist('options[]')
+    correct_answer = request.form['correct_answer']
+    quiz_id = request.form['quiz_id']
+    question = Question(
+        text=text,
+        options=options,
+        correct_answer=correct_answer,
+        quiz_id=quiz_id
+    )
+    db.session.add(question)
+    db.session.commit()
+    return redirect(url_for('admin'))
 
 @app.route('/admin/subject/<int:subject_id>/edit', methods=['POST'])
 @login_required
