@@ -1,0 +1,130 @@
+
+{% extends "base.html" %}
+{% block content %}
+    <h2>Admin Dashboard</h2>
+    
+    <h3>Existing Subjects</h3>
+    <div class="admin-section">
+        {% for subject in subjects %}
+            <div class="item-card">
+                <h4>{{ subject.name }}</h4>
+                <form action="{{ url_for('edit_subject', subject_id=subject.id) }}" method="POST" style="display:inline">
+                    <input type="text" name="name" value="{{ subject.name }}" required>
+                    <button type="submit">Update</button>
+                </form>
+                <form action="{{ url_for('delete_subject', subject_id=subject.id) }}" method="POST" style="display:inline">
+                    <button type="submit" class="delete-btn">Delete</button>
+                </form>
+            </div>
+            
+            <div class="nested-items">
+                <h4>Chapters in {{ subject.name }}</h4>
+                {% for chapter in subject.chapters %}
+                    <div class="item-card">
+                        <h5>{{ chapter.name }}</h5>
+                        <form action="{{ url_for('edit_chapter', chapter_id=chapter.id) }}" method="POST" style="display:inline">
+                            <input type="text" name="name" value="{{ chapter.name }}" required>
+                            <button type="submit">Update</button>
+                        </form>
+                        <form action="{{ url_for('delete_chapter', chapter_id=chapter.id) }}" method="POST" style="display:inline">
+                            <button type="submit" class="delete-btn">Delete</button>
+                        </form>
+                        
+                        <div class="nested-items">
+                            <h5>Quizzes in {{ chapter.name }}</h5>
+                            {% for quiz in chapter.quizzes %}
+                                <div class="item-card">
+                                    <h6>{{ quiz.title }}</h6>
+                                    <form action="{{ url_for('edit_quiz', quiz_id=quiz.id) }}" method="POST" style="display:inline">
+                                        <input type="text" name="title" value="{{ quiz.title }}" required>
+                                        <button type="submit">Update</button>
+                                    </form>
+                                    <form action="{{ url_for('delete_quiz', quiz_id=quiz.id) }}" method="POST" style="display:inline">
+                                        <button type="submit" class="delete-btn">Delete</button>
+                                    </form>
+                                    
+                                    <div class="nested-items">
+                                        <h6>Questions in {{ quiz.title }}</h6>
+                                        {% for question in quiz.questions %}
+                                            <div class="item-card">
+                                                <p>{{ question.text }}</p>
+                                                <form action="{{ url_for('edit_question', question_id=question.id) }}" method="POST">
+                                                    <input type="text" name="text" value="{{ question.text }}" required>
+                                                    {% for option in question.options %}
+                                                        <input type="text" name="options[]" value="{{ option }}" required>
+                                                    {% endfor %}
+                                                    <input type="text" name="correct_answer" value="{{ question.correct_answer }}" required>
+                                                    <button type="submit">Update</button>
+                                                </form>
+                                                <form action="{{ url_for('delete_question', question_id=question.id) }}" method="POST">
+                                                    <button type="submit" class="delete-btn">Delete</button>
+                                                </form>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+    
+    <div class="admin-section">
+        <h3>Add Subject</h3>
+        <form action="{{ url_for('add_subject') }}" method="POST">
+            <input type="text" name="name" placeholder="Subject Name" required>
+            <button type="submit">Add Subject</button>
+        </form>
+    </div>
+
+    <div class="admin-section">
+        <h3>Add Chapter</h3>
+        <form action="{{ url_for('add_chapter') }}" method="POST">
+            <select name="subject_id" required>
+                {% for subject in subjects %}
+                    <option value="{{ subject.id }}">{{ subject.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="name" placeholder="Chapter Name" required>
+            <button type="submit">Add Chapter</button>
+        </form>
+    </div>
+
+    <div class="admin-section">
+        <h3>Add Quiz</h3>
+        <form action="{{ url_for('add_quiz') }}" method="POST">
+            <select name="chapter_id" required>
+                {% for subject in subjects %}
+                    {% for chapter in subject.chapters %}
+                        <option value="{{ chapter.id }}">{{ subject.name }} - {{ chapter.name }}</option>
+                    {% endfor %}
+                {% endfor %}
+            </select>
+            <input type="text" name="title" placeholder="Quiz Title" required>
+            <button type="submit">Add Quiz</button>
+        </form>
+    </div>
+
+    <div class="admin-section">
+        <h3>Add Question</h3>
+        <form action="{{ url_for('add_question') }}" method="POST">
+            <select name="quiz_id" required>
+                {% for subject in subjects %}
+                    {% for chapter in subject.chapters %}
+                        {% for quiz in chapter.quizzes %}
+                            <option value="{{ quiz.id }}">{{ quiz.title }}</option>
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+            </select>
+            <input type="text" name="text" placeholder="Question Text" required>
+            <input type="text" name="options[]" placeholder="Option 1" required>
+            <input type="text" name="options[]" placeholder="Option 2" required>
+            <input type="text" name="options[]" placeholder="Option 3" required>
+            <input type="text" name="correct_answer" placeholder="Correct Answer" required>
+            <button type="submit">Add Question</button>
+        </form>
+    </div>
+{% endblock %}

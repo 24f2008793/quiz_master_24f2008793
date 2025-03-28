@@ -1,0 +1,38 @@
+
+{% extends "base.html" %}
+{% block content %}
+    <h2>Scoreboard</h2>
+    <div class="scores-container">
+        {% if current_user.is_admin %}
+            <h3>All Users' Scores</h3>
+            {% for user in users %}
+                <div class="user-scores">
+                    <h4>{{ user.username }}</h4>
+                    {% for score in user.scores %}
+                        <div class="score-card">
+                            <p>Quiz: {{ score.quiz.title }}</p>
+                            <p>Score: {{ score.score }}/{{ score.quiz.questions|length }}</p>
+                            <p>Percentage: {{ (score.score / score.quiz.questions|length * 100)|round(1) }}%</p>
+                            <form action="{{ url_for('delete_score', score_id=score.id) }}" method="POST" style="display:inline">
+                                <button type="submit" class="delete-btn">Delete Score</button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <p>No attempts yet</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <h3>Your Scores</h3>
+            {% for score in scores %}
+                <div class="score-card">
+                    <p>Quiz: {{ score.quiz.title }}</p>
+                    <p>Score: {{ score.score }}/{{ score.quiz.questions|length }}</p>
+                    <p>Percentage: {{ (score.score / score.quiz.questions|length * 100)|round(1) }}%</p>
+                </div>
+            {% else %}
+                <p>You haven't taken any quizzes yet!</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock %}

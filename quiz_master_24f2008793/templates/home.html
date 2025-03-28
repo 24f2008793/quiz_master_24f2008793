@@ -1,0 +1,21 @@
+
+{% extends "base.html" %}
+{% block content %}
+    <h2>Available Subjects</h2>
+    {% for subject in subjects %}
+        <div class="subject-card">
+            <h3>{{ subject.name }}</h3>
+            {% for chapter in subject.chapters %}
+                <div class="chapter-card">
+                    <h4>{{ chapter.name }}</h4>
+                    {% for quiz in chapter.quizzes %}
+                        <div class="quiz-card">
+                            <p>{{ quiz.title }}</p>
+                            <a href="{{ url_for('quiz', quiz_id=quiz.id) }}" class="btn">Take Quiz</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+{% endblock %}
